@@ -20,25 +20,20 @@ jwt_get_username_from_payload = api_settings.JWT_PAYLOAD_GET_USERNAME_HANDLER
 
 
 # class CustomJWTSerializer(JSONWebTokenSerializer):
-#     username_field = 'phone'
+#     username_field = 'username'
 #
 #     def validate(self, attrs):
 #         password = attrs.get("password")
-#         user_obj = User.objects.filter(phone=attrs.get("phone")).first()
+#         user_obj = User.objects.filter(username=attrs.get("username")).first()
 #         if user_obj is not None:
 #             credentials = {
-#                 'phone': user_obj.phone,
-#                 'password': password
+#                 'username': user_obj.username,
+#                 'password': password,
 #             }
 #             if all(credentials.values()):
 #                 user = authenticate(**credentials)
 #                 if user:
-#                     if not user.is_active:
-#                         msg = _('User account is disabled.')
-#                         raise serializers.ValidationError(msg)
-#
 #                     payload = jwt_payload_handler(user)
-#
 #                     return {
 #                         'token': jwt_encode_handler(payload),
 #                         'user': user
@@ -52,7 +47,6 @@ jwt_get_username_from_payload = api_settings.JWT_PAYLOAD_GET_USERNAME_HANDLER
 #             raise serializers.ValidationError(msg)
 
 
-
 class PhoneValidationSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
@@ -64,7 +58,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.User
-        fields = '__all__'
+        fields = ('username', 'first_name', 'last_name', 'phone', 'password', 'email')
 
     def validate(self, data):
         password = data.get('password')
@@ -77,3 +71,24 @@ class UserSerializer(serializers.ModelSerializer):
         if errors:
             raise serializers.ValidationError(errors)
         return super(UserSerializer, self).validate(data)
+
+    def create(self, validated_data):
+        user = User.objects.create(**validated_data)
+        user.username = validated_data['username']
+        user.first_name = validated_data['first_name']
+        user.last_name = validated_data['last_name']
+        user.phone = validated_data['phone']
+        user.set_password(validated_data['password'])
+        user.email = validated_data['email']
+        user.save()
+        return user
+
+    def update(self, instance, validated_data):
+        user = validated_data.get('user')
+        instance.password = user.get('password')
+        instance.email = user.get('email')
+        instance.phone = user.get('phone')
+        instance.first_name = user.get('first_name')
+        instance.last_name = user.get('last_name')
+        instance.save()
+        return instance

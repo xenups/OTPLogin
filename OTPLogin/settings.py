@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'account.User'
+AUTHENTICATION_BACKENDS = ('account.backend.PhoneEmailUsernameBackend', 'django.contrib.auth.backends.ModelBackend')
+AUTHENTICATION_BACKENDS = ('account.backend.PhoneEmailUsernameBackend',)
 
 # Application definition
 

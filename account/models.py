@@ -1,43 +1,24 @@
 import datetime
 
 import jwt
+from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth.models import PermissionsMixin
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models import Q
 
 from OTPLogin import settings
-
-
-class UserManager(BaseUserManager):
-    def _create_user(self, phone, password, **extra_fields):
-        if not phone:
-            raise ValueError('The given phone must be set')
-        user = self.model(phone=phone, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_user(self, phone, password=None, **extra_fields):
-        extra_fields.setdefault('is_superuser', False)
-        extra_fields.setdefault('is_staff', False)
-        return self._create_user(phone, password, **extra_fields)
-
-    def create_superuser(self, phone, password, **extra_fields):
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('is_staff', True)
-
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True.')
-
-        return self._create_user(phone, password, **extra_fields)
+from account.managers import UserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField('email address')
+    username = models.CharField('username', max_length=30, blank=True, unique=True)
+    email = models.EmailField('email address', unique=True)
     first_name = models.CharField('first name', max_length=30, blank=True)
     last_name = models.CharField('last name', max_length=30, blank=True)
-    date_joined = models.DateTimeField('date joined', auto_now_add=True)
+    date_joined = models.DateTimeField('date joined', auto_now_add=True, editable=True)
     is_active = models.BooleanField('active', default=True)
     is_staff = models.BooleanField('staff status', default=True, )
     otp_code = models.CharField(max_length=9, null=True, blank=True)
@@ -46,7 +27,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, editable=True)
-    USERNAME_FIELD = 'phone'
+    USERNAME_FIELD = 'username'
     objects = UserManager()
 
     class Meta:
