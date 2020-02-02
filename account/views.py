@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.utils import timezone
 from rest_framework import generics, status
 from rest_framework.exceptions import NotFound
@@ -5,6 +6,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from account import models, serializers
+from account.tasks import send_message
 from account.util import generate_otp_code, get_time_diff
 
 
@@ -26,6 +28,7 @@ class PhoneValidationView(generics.GenericAPIView):
         phone = str(request.data['phone']).strip()
         verification_status = models.User.objects.filter(phone=phone).update(otp_code=otp_code,
                                                                              updated_at=timezone.now())
+
         if verification_status:
             return Response(({'otp': otp_code}), status=status.HTTP_201_CREATED)
         raise NotFound('Phone number not found', code=status.HTTP_204_NO_CONTENT)
@@ -39,10 +42,11 @@ class RegisterUserView(generics.ListCreateAPIView):
 
 class LoginView(generics.GenericAPIView):
     permission_classes = (AllowAny,)
-    serializer_class = serializers.UserSerializer
+    serializer_class = serializers.LoginSerializer
 
     @staticmethod
     def post(request, *args, **kwargs):
+
         phone = str(request.data['phone']).strip()
         otp_code = str(request.data['otp_code']).strip()
         user = models.User.objects.filter(phone=phone, otp_code=otp_code).first()

@@ -1,15 +1,9 @@
-from rest_framework import serializers, exceptions
 import django.contrib.auth.password_validation as validators
-
-from account import models
-from rest_framework_jwt.serializers import JSONWebTokenSerializer
-
-from django.contrib.auth import authenticate, get_user_model
-from django.utils.translation import ugettext as _
+from rest_framework import exceptions
 from rest_framework import serializers
-
 from rest_framework_jwt.settings import api_settings
 
+from account import models
 # User = get_user_model()
 from account.models import User
 
@@ -51,6 +45,12 @@ class PhoneValidationSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
         fields = ('phone',)
+
+
+class LoginSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = ('phone', 'otp_code')
 
 
 class UserSerializer(serializers.ModelSerializer):

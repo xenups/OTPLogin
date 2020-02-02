@@ -22,7 +22,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField('active', default=True)
     is_staff = models.BooleanField('staff status', default=True, )
     otp_code = models.CharField(max_length=9, null=True, blank=True)
-    phone = models.CharField('phone number', validators=[RegexValidator(regex=r'^\+?1?\d{9,15}$', )], max_length=15,
+    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+    phone = models.CharField('phone number', validators=[phone_regex], max_length=15,
                              unique=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
