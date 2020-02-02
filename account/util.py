@@ -1,5 +1,5 @@
 import datetime
-import random
+import secrets
 from django.utils.timezone import utc
 
 
@@ -11,6 +11,4 @@ def get_time_diff(last_update_time):
 
 
 def generate_otp_code():
-    return random.randint(999, 9999)
-
-
+    return secrets.SystemRandom().randrange(999, 9999)
