@@ -6,7 +6,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from account import models, serializers
-from account.tasks import send_message
 from account.util import generate_otp_code, get_time_diff
 
 
