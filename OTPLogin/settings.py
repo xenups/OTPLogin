@@ -29,7 +29,6 @@ DEBUG = True
 ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'account.User'
 AUTHENTICATION_BACKENDS = ('account.backend.PhoneEmailUsernameBackend', 'django.contrib.auth.backends.ModelBackend')
-AUTHENTICATION_BACKENDS = ('account.backend.PhoneEmailUsernameBackend',)
 
 # Application definition
 
@@ -43,6 +42,18 @@ INSTALLED_APPS = [
     'rest_framework',
     'account.apps.AccountConfig'
 ]
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://localhost:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CONNECTION_POOL_KWARGS": {"max_connections": 100, "retry_on_timeout": True},
+
+        },
+    }
+}
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',

@@ -26,6 +26,7 @@ class LoginSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    # token = serializers.CharField(required=True)
 
     class Meta:
         model = models.User
