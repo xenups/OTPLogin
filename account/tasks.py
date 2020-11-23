@@ -3,7 +3,7 @@ import requests
 
 def get_token():
     url = "http://RestfulSms.com/api/Token"
-    payload = {"UserApiKey": "36f23e584fe01fd51d6c3e58", "SecretKey": "Amirlesani1368!@#"}
+    payload = {"UserApiKey": "api_key", "SecretKey": "key!@#"}
     headers = {
         'Content-Type': "application/json",
     }
